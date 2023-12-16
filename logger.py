@@ -35,9 +35,13 @@ class Logger:
     def update_log_file(cls):
         current_date = datetime.now().strftime('%d-%m-%Y')
         if cls.last_date != current_date:
+            log_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
             cls.last_date = current_date
             cls.log_file = f"logs/logfile_{current_date}.log"
-            cls.log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs", f"logfile_{current_date}.log")
+            cls.log_file = os.path.join(log_directory, f"logfile_{current_date}.log")
+
+            # Создаем каталог, если его нет
+            os.makedirs(log_directory, exist_ok=True)
 
     def debug(self, message, print_to_console=True):
         if print_to_console == True:
