@@ -1,19 +1,29 @@
-import os
 import json
+import os
 from datetime import datetime
 from logger import log
 
+
 # Исключения
-class tzeUserNotFound(Exception):
+class TzeUserNotFound(Exception):
     pass
-class tzeCommandListEmpty(Exception):
+
+
+class TzeCommandListEmpty(Exception):
     pass
-class tzeCommandNotFound(Exception):
+
+
+class TzeCommandNotFound(Exception):
     pass
-class tzeCommandExpired(Exception):
+
+
+class TzeCommandExpired(Exception):
     pass
-class tzeCheckSuccess(Exception):
+
+
+class TzeCheckSuccess(Exception):
     pass
+
 
 # Хранилище разрешений
 permissions_data = {}
@@ -23,6 +33,7 @@ PERMISSIONS_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 # Последнее изменение файла
 last_modification_time = None
+
 
 # Загрузка разрешений из файла
 def load_permissions():
@@ -49,6 +60,7 @@ def load_permissions():
         log.error(f"Error loading permissions: {e}")
         permissions_data = {}
 
+
 # Сохранение разрешений в файл
 def save_permissions(file_path):
     try:
@@ -58,6 +70,7 @@ def save_permissions(file_path):
     except Exception as e:
         log.error(f"Error saving permissions to {file_path}: {e}")
 
+
 # Функция проверки разрешения
 def check_permission(message, command):
     try:
@@ -65,35 +78,35 @@ def check_permission(message, command):
         load_permissions()
         user_permissions = permissions_data.get("users", {}).get(str(message.from_user.id), {})
         if not user_permissions:
-            raise tzeUserNotFound("")
+            raise TzeUserNotFound("")
 
         command_permissions = user_permissions.get("commands")
         if not command_permissions:
-            raise tzeCommandListEmpty("")
+            raise TzeCommandListEmpty("")
 
-        expiration_date_str = command_permissions.get(command)  
+        expiration_date_str = command_permissions.get(command)
         if not expiration_date_str:
-            raise tzeCommandNotFound("")
+            raise TzeCommandNotFound("")
 
         expiration_date = datetime.strptime(expiration_date_str, "%Y-%m-%d %H:%M:%S")
         current_date = datetime.now()
         if current_date > expiration_date:
-            raise tzeCommandExpired("")
+            raise TzeCommandExpired("")
         else:
-            raise tzeCheckSuccess("")
+            raise TzeCheckSuccess("")
 
-    except tzeCheckSuccess as e:
+    except TzeCheckSuccess:
         return {"code": "SUCCESS", "message": "Permission granted."}
-    except tzeUserNotFound as e:
+    except TzeUserNotFound:
         error_message = f"Error: User <code>{message.from_user.id}</code> [@{message.from_user.username}] not found in permissions table."
         return {"code": "USER_NOT_FOUND", "message": error_message}
-    except tzeCommandListEmpty as e:
+    except TzeCommandListEmpty:
         error_message = f"Error: User <code>{message.from_user.id}</code> [@{message.from_user.username}] has no commands in permissions table."
         return {"code": "COMMAND_LIST_EMPTY", "message": error_message}
-    except tzeCommandNotFound as e:
+    except TzeCommandNotFound:
         error_message = f"Error: Command <code>{command}</code> not found in permissions for user <code>{message.from_user.id}</code> [@{message.from_user.username}]."
         return {"code": "COMMAND_NOT_FOUND", "message": error_message}
-    except tzeCommandExpired as e:
+    except TzeCommandExpired:
         error_message = f"Error: Permission for command <code>{command}</code> expired for user <code>{message.from_user.id}</code> [@{message.from_user.username}]."
         return {"code": "EXPIRED_PERMISSION", "message": error_message}
     except KeyError:

@@ -1,6 +1,7 @@
 import logging
-from datetime import datetime, timedelta
 import os
+from datetime import datetime
+
 
 class Logger:
     _instance = None
@@ -44,37 +45,37 @@ class Logger:
             os.makedirs(log_directory, exist_ok=True)
 
     def debug(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.debug(message)
 
     def info(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.info(message)
 
     def warning(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.warning(message)
 
     def error(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.error(message)
 
     def exception(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.exception(message)
 
     def critical(self, message, print_to_console=True):
-        if print_to_console == True:
+        if print_to_console:
             print(message)
         self.update_log_file()
         self.logger.critical(message)
@@ -83,6 +84,7 @@ class Logger:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.update_log_file()
         self.logger.info(f"Timestamp: {timestamp}")
+
 
 # Создаем экземпляр синглтона
 log = Logger()
