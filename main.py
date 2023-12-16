@@ -33,7 +33,7 @@ COMMAND_DISCORDBOT_RESTART = "restart_discordbot'"
 # Создание уникального имени файла средствами системы
 #
 def generate_unique_filename(file_suffix=""):
-    _, temp_filename = tempfile.mkstemp(suffix=file_suffix, dir='/var/tmp/')
+    _, temp_filename = tempfile.mkstemp(suffix=file_suffix)
     return temp_filename
 
 
