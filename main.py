@@ -3,6 +3,7 @@ import signal
 import re
 import shutil
 import os
+import tempfile
 from subprocess import check_output
 import telebot
 from telebot import types
@@ -28,6 +29,13 @@ COMMAND_STATUS = "status'"
 COMMAND_STOP = "stop'"
 COMMAND_RESTART = "restart'"
 COMMAND_DISCORDBOT_RESTART = "restart_discordbot'"
+
+#
+# Создание уникального имени файла средствами системы
+#
+def generate_unique_filename(file_suffix=""):
+    _, temp_filename = tempfile.mkstemp(suffix=file_suffix, dir='/var/tmp/')
+    return temp_filename
 
 #
 # Проверка доступа пользователя
@@ -174,7 +182,7 @@ def handle_button_click(call):
 	if option in dashboard_options:
 		option_values = dashboard_options[option]
 		# Уникальное имя файла для графика, чтобы избежать конфликтов имён
-		file_name = str(uuid.uuid4()) + ".png"
+		file_name = generate_unique_filename() + ".png"
 		# Обрабатываем выбранную опцию
 		get_grafana_panel_image(
 			file_name,
