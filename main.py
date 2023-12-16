@@ -10,6 +10,7 @@ import requests
 from config import bot_token, api_url, api_key, dashboard_options
 from permissions import check_permission
 from logger import log
+import uuid
 
 # Флаг для контроля выхода из цикла
 exit_flag = False
@@ -33,7 +34,6 @@ COMMAND_DISCORDBOT_RESTART = "restart_discordbot'"
 #
 def check_and_send_permission_error(message, command):
 	permission_result = check_permission(message, command)
-	print(permission_result)
 	if permission_result["code"] != "SUCCESS":
 		error_message = permission_result["message"]
 		bot.send_message(message.chat.id, error_message, parse_mode='HTML')
@@ -45,7 +45,7 @@ def check_and_send_permission_error(message, command):
 #
 # Изображение графика
 #
-def get_grafana_panel_image(api_url, api_key, dashboard_uid, panel_id, timefrom="now", timeto="now-6h", width=1000, height=500):
+def get_grafana_panel_image(file_name, api_url, api_key, dashboard_uid, panel_id, timefrom="now", timeto="now-6h", width=1000, height=500):
 	url = f"{api_url}/render/d-solo/{dashboard_uid}?orgId=1&panelId={panel_id}&width={width}&height={height}&tz=Europe/Moscow&from=${timefrom}&to=${timeto}"
 
 	headers = {
@@ -55,7 +55,7 @@ def get_grafana_panel_image(api_url, api_key, dashboard_uid, panel_id, timefrom=
 	response = requests.get(url, headers=headers, stream=True)
 
 	if response.status_code == 200:
-		with open(f"panel_image.png", 'wb') as f:
+		with open(f"{file_name}", 'wb') as f:
 			for chunk in response.iter_content(chunk_size=1024):
 				if chunk:
 					f.write(chunk)
@@ -144,8 +144,9 @@ def server_restart_lctest(message):
 		command = f"sudo -u lctest bash -c 'cd ~/ && ./run.sh -u {get_username_by_id(message.from_user.id)} {COMMAND_RESTART}"
 		send_confirmation_message(message, "Действие приведёт к перезапуску сервера.", command)
 
+#
 # Grafana
-
+#
 # Добавляем хендлер для команды "grafana"
 @bot.message_handler(commands=['grafana'])
 def handle_grafana(message):
@@ -172,8 +173,11 @@ def handle_button_click(call):
 
 	if option in dashboard_options:
 		option_values = dashboard_options[option]
+		# Уникальное имя файла для графика, чтобы избежать конфликтов имён
+		file_name = str(uuid.uuid4()) + ".png"
 		# Обрабатываем выбранную опцию
 		get_grafana_panel_image(
+			file_name,
 			api_url,
 			api_key,
 			option_values['dashboard_uid'],
@@ -186,10 +190,10 @@ def handle_button_click(call):
 
 		log.info(f"GRAFANA: chat id: {call.message.chat.id}, username: {call.message.from_user.username}, user id: {call.message.from_user.id}, option: {option}")
 		# Отправляем изображение пользователю
-		with open('panel_image.png', 'rb') as photo:
+		with open(file_name, 'rb') as photo:
 			bot.send_photo(call.message.chat.id, photo)
 		# Удаляем файл
-		os.remove('panel_image.png')
+		os.remove(file_name)
 
 # Whatever
 @bot.message_handler(content_types=["text"])
