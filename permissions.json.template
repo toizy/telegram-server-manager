@@ -1,0 +1,18 @@
+{
+  "users": {
+    "**********": {
+      "name": "Admin",
+      "comment": "comment",
+      "commands": {
+        "server_status_lcnova": "2030-01-01 00:00:00",
+        "server_status_lctest": "2030-01-01 00:00:00",
+        "server_restart_lcnova": "2030-01-01 00:00:00",
+        "server_restart_lctest": "2030-01-01 00:00:00",
+        "server_stop_lcnova": "2030-01-01 00:00:00",
+        "server_stop_lctest": "2030-01-01 00:00:00",
+        "server_lcnova_dbot_restart": "2030-01-01 00:00:00",
+        "grafana": "2030-01-01 00:00:00"
+      }
+    }
+  }
+}
